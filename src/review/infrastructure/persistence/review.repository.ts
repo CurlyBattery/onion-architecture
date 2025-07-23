@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { IRepository } from '@app/interfaces';
-import { IReview } from './interfaces';
-import { PrismaService } from '../prisma/prisma.service';
+
+import { IReviewRepository } from '../../domain/ports/review-repository.port';
+import { PrismaService } from '../../../prisma/prisma.service';
+import { IReview } from '../../domain/entities/review.entity';
 
 @Injectable()
-export class ReviewRepository implements IRepository<IReview> {
+export class ReviewRepository implements IReviewRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   get(id: number): Promise<IReview> {

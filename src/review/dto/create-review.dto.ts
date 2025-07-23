@@ -1,6 +1,6 @@
-import { IReview } from '../interfaces';
+import { IReview } from '../domain/entities/review.entity';
 
-export class CreateReviewDto implements Partial<IReview> {
+export class CreateReviewDto implements IReview {
   title: string;
   content: string;
 }

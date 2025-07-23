@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
-import { ReviewService } from './review.service';
-import { ReviewController } from './review.controller';
-import { REVIEW_REPOSITORY_TOKEN, REVIEW_SERVICE_TOKEN } from './interfaces';
-import { ReviewRepository } from './review.repository';
+
+import { ReviewController } from './infrastructure/http/review.controller';
+import { REVIEW_SERVICE_TOKEN } from './domain/ports/review-service.port';
+import { ReviewService } from './application/review.service';
+import { REVIEW_REPOSITORY_TOKEN } from './domain/ports/review-repository.port';
+import { ReviewRepository } from './infrastructure/persistence/review.repository';
 
 @Module({
   controllers: [ReviewController],

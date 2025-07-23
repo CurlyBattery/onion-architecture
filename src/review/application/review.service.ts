@@ -1,13 +1,17 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-import { IReview, IReviewService, REVIEW_REPOSITORY_TOKEN } from './interfaces';
-import { IRepository } from '@app/interfaces';
+import { IReviewService } from '../domain/ports/review-service.port';
+import {
+  IReviewRepository,
+  REVIEW_REPOSITORY_TOKEN,
+} from '../domain/ports/review-repository.port';
+import { IReview } from '../domain/entities/review.entity';
 
 @Injectable()
 export class ReviewService implements IReviewService {
   constructor(
     @Inject(REVIEW_REPOSITORY_TOKEN)
-    private readonly repository: IRepository<IReview>,
+    private readonly repository: IReviewRepository,
   ) {}
 
   async createReview(createReviewDto: IReview): Promise<IReview> {

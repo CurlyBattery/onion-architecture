@@ -1,7 +1,6 @@
-import { IReview } from './review.inteface';
+import { IReview } from '../entities/review.entity';
 
 export const REVIEW_SERVICE_TOKEN = 'REVIEW_SERVICE_TOKEN';
-export const REVIEW_REPOSITORY_TOKEN = 'REVIEW_REPOSITORY_TOKEN';
 
 export interface IReviewService {
   createReview(createReviewDto: IReview): Promise<IReview>;

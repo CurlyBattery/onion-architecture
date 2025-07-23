@@ -1,6 +1,9 @@
 import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
-import { CreateReviewDto } from './dto';
-import { IReviewService, REVIEW_SERVICE_TOKEN } from './interfaces';
+import {
+  IReviewService,
+  REVIEW_SERVICE_TOKEN,
+} from '../../domain/ports/review-service.port';
+import { CreateReviewDto } from '../../dto/create-review.dto';
 
 @Controller('review')
 export class ReviewController {
