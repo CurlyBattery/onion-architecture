@@ -21,4 +21,20 @@ export class ReviewService implements IReviewService {
   async getReviews(): Promise<IReview[]> {
     return await this.repository.getAll();
   }
+
+  async getReviewById(id: number): Promise<IReview> {
+    return await this.repository.get(id);
+  }
+
+  async deleteReview(id: number): Promise<{ message: string }> {
+    await this.repository.delete(id);
+    return { message: 'Successfully deleted review' };
+  }
+
+  async updateReview(
+    id: number,
+    updateReviewDto: Partial<IReview>,
+  ): Promise<IReview> {
+    return await this.repository.update(id, updateReviewDto);
+  }
 }

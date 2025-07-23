@@ -9,18 +9,25 @@ export class ReviewRepository implements IReviewRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   get(id: number): Promise<IReview> {
-    throw new Error('Method not implemented.');
+    return this.prisma.review.findUnique({
+      where: { id },
+    });
   }
-  delete(id: number): void {
-    throw new Error('Method not implemented.');
+  async delete(id: number): Promise<void> {
+    await this.prisma.review.delete({
+      where: { id },
+    });
   }
   save(input: IReview): Promise<IReview> {
     return this.prisma.review.create({
       data: input,
     });
   }
-  update(input: IReview): Promise<IReview> {
-    throw new Error('Method not implemented.');
+  update(id: number, input: Partial<IReview>): Promise<IReview> {
+    return this.prisma.review.update({
+      where: { id },
+      data: input,
+    });
   }
   getAll(): Promise<IReview[]> {
     return this.prisma.review.findMany();
