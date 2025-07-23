@@ -15,6 +15,7 @@ import {
 import { CreateReviewDto } from '../../dto/create-review.dto';
 import { FindOneParams } from '@app/types';
 import { UpdateReviewDto } from '../../dto/update-review.dto';
+import { IReview } from '../../domain/entities/review.entity';
 
 @Controller('review')
 export class ReviewController {
@@ -25,7 +26,12 @@ export class ReviewController {
 
   @Post()
   createReview(@Body() createReviewDto: CreateReviewDto) {
-    return this.reviewService.createReview(createReviewDto);
+    const review: IReview = {
+      title: createReviewDto.title,
+      content: createReviewDto.content,
+    };
+
+    return this.reviewService.createReview(review);
   }
 
   @Get()
@@ -48,6 +54,11 @@ export class ReviewController {
     @Param() { id }: FindOneParams,
     @Body() updateReviewDto: UpdateReviewDto,
   ) {
-    return this.reviewService.updateReview(id, updateReviewDto);
+    const update: Partial<IReview> = {
+      title: updateReviewDto.title,
+      content: updateReviewDto.content,
+    };
+
+    return this.reviewService.updateReview(id, update);
   }
 }

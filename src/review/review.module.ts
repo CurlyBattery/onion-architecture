@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 
 import { ReviewController } from './infrastructure/http/review.controller';
 import { REVIEW_SERVICE_TOKEN } from './domain/ports/review-service.port';
-import { ReviewService } from './application/review.service';
+import { ReviewUseCase } from './application/reviewUseCase';
 import { REVIEW_REPOSITORY_TOKEN } from './domain/ports/review-repository.port';
 import { ReviewRepository } from './infrastructure/persistence/review.repository';
 
@@ -11,7 +11,7 @@ import { ReviewRepository } from './infrastructure/persistence/review.repository
   providers: [
     {
       provide: REVIEW_SERVICE_TOKEN,
-      useClass: ReviewService,
+      useClass: ReviewUseCase,
     },
     {
       provide: REVIEW_REPOSITORY_TOKEN,

@@ -8,14 +8,14 @@ import {
 import { IReview } from '../domain/entities/review.entity';
 
 @Injectable()
-export class ReviewService implements IReviewService {
+export class ReviewUseCase implements IReviewService {
   constructor(
     @Inject(REVIEW_REPOSITORY_TOKEN)
     private readonly repository: IReviewRepository,
   ) {}
 
-  async createReview(createReviewDto: IReview): Promise<IReview> {
-    return await this.repository.save(createReviewDto);
+  async createReview(input: IReview): Promise<IReview> {
+    return await this.repository.save(input);
   }
 
   async getReviews(): Promise<IReview[]> {
@@ -31,10 +31,7 @@ export class ReviewService implements IReviewService {
     return { message: 'Successfully deleted review' };
   }
 
-  async updateReview(
-    id: number,
-    updateReviewDto: Partial<IReview>,
-  ): Promise<IReview> {
-    return await this.repository.update(id, updateReviewDto);
+  async updateReview(id: number, input: Partial<IReview>): Promise<IReview> {
+    return await this.repository.update(id, input);
   }
 }
