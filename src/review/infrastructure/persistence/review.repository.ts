@@ -16,7 +16,7 @@ export class ReviewRepository implements IReviewRepository {
     include?: any;
   }): Promise<IReview> {
     const { where, select } = params;
-    return this.prisma.review.findUnique({
+    return this.prisma.review.findUniqueOrThrow({
       where,
       select,
     });
