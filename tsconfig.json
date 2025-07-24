@@ -29,6 +29,12 @@
       ],
       "@app/types/*": [
         "libs/types/src/*"
+      ],
+      "@app/filters": [
+        "libs/filters/src"
+      ],
+      "@app/filters/*": [
+        "libs/filters/src/*"
       ]
     }
   }

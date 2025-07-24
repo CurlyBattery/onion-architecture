@@ -1,4 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { IReviewService } from '../domain/ports/review-service.port';
 import {
@@ -6,6 +11,8 @@ import {
   REVIEW_REPOSITORY_TOKEN,
 } from '../domain/ports/review-repository.port';
 import { IReview } from '../domain/entities/review.entity';
+import { ReviewNotFoundException } from '../domain/exceptions/review-not-found.exception';
+import { ReviewConflictException } from '../domain/exceptions/review-conflict.exception';
 
 @Injectable()
 export class ReviewUseCase implements IReviewService {
@@ -15,23 +22,41 @@ export class ReviewUseCase implements IReviewService {
   ) {}
 
   async createReview(input: IReview): Promise<IReview> {
-    return await this.repository.save(input);
+    const existsReview = await this.repository.get({
+      where: { title: input.title },
+    });
+    if (existsReview) {
+      throw new ReviewConflictException();
+    }
+    return await this.repository.save({ data: input });
   }
 
   async getReviews(): Promise<IReview[]> {
-    return await this.repository.getAll();
+    return await this.repository.getAll({});
   }
 
   async getReviewById(id: number): Promise<IReview> {
-    return await this.repository.get(id);
+    const review = await this.repository.get({ where: { id } });
+    if (!review) {
+      throw new ReviewNotFoundException();
+    }
+    return review;
   }
 
   async deleteReview(id: number): Promise<{ message: string }> {
-    await this.repository.delete(id);
+    const review = await this.repository.get({ where: { id } });
+    if (!review) {
+      throw new ReviewNotFoundException();
+    }
+    await this.repository.delete({ where: { id } });
     return { message: 'Successfully deleted review' };
   }
 
   async updateReview(id: number, input: Partial<IReview>): Promise<IReview> {
-    return await this.repository.update(id, input);
+    const review = await this.repository.get({ where: { id } });
+    if (!review) {
+      throw new ReviewNotFoundException();
+    }
+    return await this.repository.update({ where: { id }, data: input });
   }
 }

@@ -1,7 +1,27 @@
-export interface IRepository<T> {
-  get(id: number): Promise<T>;
-  delete(id: number): Promise<void>;
-  save(input: T): Promise<T>;
-  update(id: number, input: Partial<T>): Promise<T>;
-  getAll(): Promise<T[]>;
+export interface IRepository<
+  T,
+  WhereInput,
+  Select,
+  Include,
+  CreateInput,
+  UpdateInput,
+> {
+  get(params: {
+    where: WhereInput;
+    select?: Select;
+    include?: Include;
+  }): Promise<T>;
+  delete(params: { where: WhereInput }): Promise<void>;
+  save(params: {
+    data: CreateInput;
+    select?: Select;
+    include?: Include;
+  }): Promise<T>;
+  update(params: {
+    where: WhereInput;
+    data: UpdateInput;
+    select?: Select;
+    include?: Include;
+  }): Promise<T>;
+  getAll(params: { select?: Select; include?: Include }): Promise<T[]>;
 }

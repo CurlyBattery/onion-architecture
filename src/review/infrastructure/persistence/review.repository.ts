@@ -3,33 +3,63 @@ import { Injectable } from '@nestjs/common';
 import { IReviewRepository } from '../../domain/ports/review-repository.port';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { IReview } from '../../domain/entities/review.entity';
+import { Prisma } from 'generated/prisma';
+import { DefaultArgs } from 'generated/prisma/runtime/library';
 
 @Injectable()
 export class ReviewRepository implements IReviewRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  get(id: number): Promise<IReview> {
+  get(params: {
+    where: Prisma.ReviewWhereUniqueInput;
+    select?: Prisma.ReviewSelect<DefaultArgs>;
+    include?: any;
+  }): Promise<IReview> {
+    const { where, select } = params;
     return this.prisma.review.findUnique({
-      where: { id },
+      where,
+      select,
     });
   }
-  async delete(id: number): Promise<void> {
+  async delete(params: {
+    where: Prisma.ReviewWhereUniqueInput;
+  }): Promise<void> {
+    const { where } = params;
     await this.prisma.review.delete({
-      where: { id },
+      where,
     });
   }
-  save(input: IReview): Promise<IReview> {
+  save(params: {
+    data: Prisma.ReviewCreateInput;
+    select?: Prisma.ReviewSelect<DefaultArgs>;
+    include?: any;
+  }): Promise<IReview> {
+    const { data, select } = params;
     return this.prisma.review.create({
-      data: input,
+      data,
+      select,
     });
   }
-  update(id: number, input: Partial<IReview>): Promise<IReview> {
+  update(params: {
+    where: Prisma.ReviewWhereUniqueInput;
+    data: Prisma.ReviewUpdateInput;
+    select?: Prisma.ReviewSelect<DefaultArgs>;
+    include?: any;
+  }): Promise<IReview> {
+    const { where, data, select } = params;
     return this.prisma.review.update({
-      where: { id },
-      data: input,
+      where,
+      data,
+      select,
     });
   }
-  getAll(): Promise<IReview[]> {
-    return this.prisma.review.findMany();
+  getAll(params: {
+    select?: Prisma.ReviewSelect<DefaultArgs>;
+    include?: any;
+  }): Promise<IReview[]> {
+    const { select } = params;
+    return this.prisma.review.findMany({
+      select,
+    });
   }
 }

@@ -79,7 +79,8 @@
     ],
     "moduleNameMapper": {
       "^@app/interfaces(|/.*)$": "<rootDir>/libs/interfaces/src/$1",
-      "^@app/types(|/.*)$": "<rootDir>/libs/types/src/$1"
+      "^@app/types(|/.*)$": "<rootDir>/libs/types/src/$1",
+      "^@app/filters(|/.*)$": "<rootDir>/libs/filters/src/$1"
     }
   }
 }
