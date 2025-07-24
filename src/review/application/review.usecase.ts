@@ -52,6 +52,14 @@ export class ReviewUseCase implements IReviewService {
     if (!review) {
       throw new ReviewNotFoundException();
     }
+    if (input.title) {
+      const existsReview = await this.repository.get({
+        where: { title: input.title },
+      });
+      if (existsReview) {
+        throw new ReviewConflictException();
+      }
+    }
     return await this.repository.update({ where: { id }, data: input });
   }
 }

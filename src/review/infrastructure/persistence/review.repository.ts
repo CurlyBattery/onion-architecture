@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from 'nestjs-prisma';
 
 import { IReviewRepository } from '../../domain/ports/review-repository.port';
-import { PrismaService } from '../../../prisma/prisma.service';
 import { IReview } from '../../domain/entities/review.entity';
 import { Prisma } from 'generated/prisma';
 import { DefaultArgs } from 'generated/prisma/runtime/library';
@@ -16,7 +16,7 @@ export class ReviewRepository implements IReviewRepository {
     include?: any;
   }): Promise<IReview> {
     const { where, select } = params;
-    return this.prisma.review.findUniqueOrThrow({
+    return this.prisma.review.findUnique({
       where,
       select,
     });
