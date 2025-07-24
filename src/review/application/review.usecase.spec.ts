@@ -27,7 +27,7 @@ describe('ReviewUseCase', () => {
     const result = await useCase.createReview(input);
 
     expect(result).toEqual(created);
-    expect(mockRepository.save).toHaveBeenCalledWith(input);
+    expect(mockRepository.save).toHaveBeenCalledWith({ data: input });
   });
 
   it('should get all reviews', async () => {
@@ -47,36 +47,52 @@ describe('ReviewUseCase', () => {
     const result = await useCase.getReviewById(1);
 
     expect(result).toEqual(review);
-    expect(mockRepository.get).toHaveBeenCalledWith(1);
+    expect(mockRepository.get).toHaveBeenCalledWith({ where: { id: 1 } });
   });
 
   it('should delete a review', async () => {
+    const review: IReview = { id: 1, title: 'Title', content: 'Text' };
+    mockRepository.get.mockResolvedValue(review);
+
     mockRepository.delete.mockResolvedValue(undefined);
 
     const result = await useCase.deleteReview(1);
 
     expect(result).toEqual({ message: 'Successfully deleted review' });
-    expect(mockRepository.delete).toHaveBeenCalledWith(1);
+    expect(mockRepository.delete).toHaveBeenCalledWith({ where: { id: 1 } });
   });
 
   it('should update a review', async () => {
+    const existsReview: IReview = {
+      id: 1,
+      title: 'Old Title',
+      content: 'Old Content',
+    };
+
     const updated: IReview = {
       id: 1,
-      title: 'Updated',
-      content: 'Updated content',
+      title: 'Updated Title',
+      content: 'Updated Content',
     };
+
+    mockRepository.get.mockResolvedValueOnce(existsReview);
+
+    mockRepository.get.mockResolvedValueOnce(undefined);
 
     mockRepository.update.mockResolvedValue(updated);
 
     const result = await useCase.updateReview(1, {
-      title: 'Updated',
-      content: 'Updated content',
+      title: 'Updated Title',
+      content: 'Updated Content',
     });
 
     expect(result).toEqual(updated);
-    expect(mockRepository.update).toHaveBeenCalledWith(1, {
-      title: 'Updated',
-      content: 'Updated content',
+    expect(mockRepository.update).toHaveBeenCalledWith({
+      where: { id: 1 },
+      data: {
+        title: 'Updated Title',
+        content: 'Updated Content',
+      },
     });
   });
 });
