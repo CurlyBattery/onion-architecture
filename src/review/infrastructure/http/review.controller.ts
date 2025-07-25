@@ -29,6 +29,7 @@ export class ReviewController {
     const review: IReview = {
       title: createReviewDto.title,
       content: createReviewDto.content,
+      userId: 1,
     };
 
     return this.reviewService.createReview(review);

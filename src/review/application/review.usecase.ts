@@ -47,7 +47,10 @@ export class ReviewUseCase implements IReviewService {
     return { message: 'Successfully deleted review' };
   }
 
-  async updateReview(id: number, input: Partial<IReview>): Promise<IReview> {
+  async updateReview(
+    id: number,
+    input: Partial<Omit<IReview, 'userId' | 'user'>>,
+  ): Promise<IReview> {
     const review = await this.repository.get({ where: { id } });
     if (!review) {
       throw new ReviewNotFoundException();

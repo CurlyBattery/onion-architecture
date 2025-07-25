@@ -30,7 +30,7 @@ export class ReviewRepository implements IReviewRepository {
     });
   }
   save(params: {
-    data: Prisma.ReviewCreateInput;
+    data: Prisma.ReviewUncheckedCreateInput;
     select?: Prisma.ReviewSelect<DefaultArgs>;
     include?: any;
   }): Promise<IReview> {

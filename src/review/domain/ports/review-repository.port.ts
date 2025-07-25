@@ -10,6 +10,6 @@ export interface IReviewRepository
     Prisma.ReviewWhereUniqueInput,
     Prisma.ReviewSelect,
     any,
-    Prisma.ReviewCreateInput,
+    Prisma.ReviewUncheckedCreateInput,
     Prisma.ReviewUpdateInput
   > {}

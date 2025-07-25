@@ -5,6 +5,8 @@ import {
 } from 'nestjs-prisma';
 
 import { ReviewModule } from './review/review.module';
+import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -12,6 +14,8 @@ import { ReviewModule } from './review/review.module';
       isGlobal: true,
     }),
     ReviewModule,
+    UserModule,
+    AuthModule,
   ],
   providers: [providePrismaClientExceptionFilter()],
 })

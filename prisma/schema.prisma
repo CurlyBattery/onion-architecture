@@ -22,4 +22,23 @@ model Review {
   id      Int    @id @default(autoincrement())
   title   String @unique
   content String
+  userId  Int    @map("user_id")
+  user    User   @relation(references: [id], fields: [userId], onDelete: Cascade)
+
+  @@map("reviews")
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  username String   @unique
+  password String
+  role     Role
+  reviews  Review[]
+
+  @@map("users")
+}
+
+enum Role {
+  Reviewer
+  Manager
 }
