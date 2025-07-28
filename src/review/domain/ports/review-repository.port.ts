@@ -9,7 +9,7 @@ export interface IReviewRepository
     IReview,
     Prisma.ReviewWhereUniqueInput,
     Prisma.ReviewSelect,
-    any,
+    Prisma.ReviewInclude,
     Prisma.ReviewUncheckedCreateInput,
     Prisma.ReviewUpdateInput
   > {}

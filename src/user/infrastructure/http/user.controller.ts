@@ -1,7 +1,10 @@
-import { Controller } from '@nestjs/common';
-import { UserUsecase } from '../../application/user.usecase';
+import { Controller, Inject } from '@nestjs/common';
+import { UserUseCase } from '../../application/user-use-case.service';
+import { USER_SERVICE_TOKEN } from '../../domain/ports/user-service.port';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserUsecase) {}
+  constructor(
+    @Inject(USER_SERVICE_TOKEN) private readonly userService: UserUseCase,
+  ) {}
 }
