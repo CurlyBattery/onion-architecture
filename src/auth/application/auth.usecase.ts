@@ -1,4 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
+
 import {
   IUserService,
   USER_SERVICE_TOKEN,
@@ -6,7 +9,6 @@ import {
 import { IAuthService } from '../domain/ports/auth-service.port';
 import { IUser } from 'src/user/domain/entities/user.entity';
 import { ITokens } from '../domain/entities/tokens.entity';
-import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthUseCase implements IAuthService {
@@ -22,13 +24,30 @@ export class AuthUseCase implements IAuthService {
     return { accessToken, refreshToken: 'wg' };
   }
 
+  async checkPassword(input: IUser): Promise<ITokens> {
+    const accessToken = await this.generateAt(input);
+    return { accessToken, refreshToken: 'gw' };
+  }
+
+  async validateUser(username: string, password: string) {
+    const existsUser = await this.userUseCase.getUserByUsername(username);
+
+    if (await this.isComparePasswords(password, existsUser.password)) {
+      return existsUser;
+    }
+    return null;
+  }
+
+  private async isComparePasswords(
+    inputPassword: string,
+    hashedPassword: string,
+  ): Promise<boolean> {
+    return bcrypt.compareSync(inputPassword, hashedPassword);
+  }
+
   private async generateAt(user: IUser) {
     const payload = { sub: user.id, role: user.role };
     return await this.jwtService.signAsync(payload);
-  }
-
-  signIn(input: IUser): Promise<ITokens> {
-    throw new Error('Method not implemented.');
   }
 
   authenticated(input: Omit<ITokens, 'refreshToken'>): Promise<IUser> {

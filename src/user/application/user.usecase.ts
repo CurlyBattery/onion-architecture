@@ -4,6 +4,8 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
+
 import { IUserService } from '../domain/ports/user-service.port';
 import { IUser } from '../domain/entities/user.entity';
 import {
@@ -24,7 +26,12 @@ export class UserUseCase implements IUserService {
     if (existingUser) {
       throw new ConflictException('User already exists');
     }
-    return await this.repository.save({ data: input });
+
+    const hashPassword = bcrypt.hashSync(input.password, 10);
+
+    return await this.repository.save({
+      data: { ...input, password: hashPassword },
+    });
   }
 
   async getUserById(id: number): Promise<IUser> {
