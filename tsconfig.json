@@ -35,6 +35,12 @@
       ],
       "@app/filters/*": [
         "libs/filters/src/*"
+      ],
+      "@app/decorators": [
+        "libs/decorators/src"
+      ],
+      "@app/decorators/*": [
+        "libs/decorators/src/*"
       ]
     }
   }

@@ -1,6 +1,8 @@
 import { Body, Controller, Inject, Param, Patch } from '@nestjs/common';
-import { UserUseCase } from '../../application/user-use-case.service';
-import { USER_SERVICE_TOKEN } from '../../domain/ports/user-service.port';
+import {
+  IUserService,
+  USER_SERVICE_TOKEN,
+} from '../../domain/ports/user-service.port';
 import { FindOneParams } from '@app/types';
 import { UpdateUserDto } from '../../dto/update-user.dto';
 import { IUser } from '../../domain/entities/user.entity';
@@ -8,7 +10,7 @@ import { IUser } from '../../domain/entities/user.entity';
 @Controller('user')
 export class UserController {
   constructor(
-    @Inject(USER_SERVICE_TOKEN) private readonly userService: UserUseCase,
+    @Inject(USER_SERVICE_TOKEN) private readonly userService: IUserService,
   ) {}
 
   @Patch(':id')
