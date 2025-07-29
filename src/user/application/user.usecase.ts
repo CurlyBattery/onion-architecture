@@ -27,7 +27,7 @@ export class UserUseCase implements IUserService {
       throw new ConflictException('User already exists');
     }
 
-    const hashPassword = bcrypt.hashSync(input.password, 10);
+    const hashPassword = await bcrypt.hash(input.password, 10);
 
     return await this.repository.save({
       data: { ...input, password: hashPassword },

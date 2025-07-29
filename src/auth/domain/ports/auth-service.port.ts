@@ -1,10 +1,11 @@
 import { IUser } from '../../../user/domain/entities/user.entity';
 import { ITokens } from '../entities/tokens.entity';
+import { IFingerprint } from 'nestjs-fingerprint';
 
 export const AUTH_SERVICE_TOKEN = 'AUTH_SERVICE_TOKEN';
 
 export interface IAuthService {
-  signUp(input: IUser): Promise<ITokens>;
+  signUp(input: IUser, fp: IFingerprint): Promise<ITokens>;
   checkPassword(input: IUser): Promise<ITokens>;
   authenticated(input: Omit<ITokens, 'refreshToken'>): Promise<IUser>;
   validateUser(username: string, password: string): Promise<IUser>;

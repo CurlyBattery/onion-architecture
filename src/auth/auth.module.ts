@@ -11,6 +11,9 @@ import { LocalStrategy } from './infrastructure/strategies/local.strategy';
 import { JwtStrategy } from './infrastructure/strategies/jwt.strategy';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './infrastructure/guards/jwt-auth.guard';
+import { RefreshSessionRepository } from './infrastructure/persistence/refresh-session.repository';
+import { USER_REPOSITORY_TOKEN } from '../user/domain/ports/user-repository.port';
+import { REFRESH_SESSION_REPOSITORY_TOKEN } from './domain/ports/refresh-session-repository.port';
 
 @Module({
   imports: [
@@ -31,6 +34,10 @@ import { JwtAuthGuard } from './infrastructure/guards/jwt-auth.guard';
     {
       provide: AUTH_SERVICE_TOKEN,
       useClass: AuthUseCase,
+    },
+    {
+      provide: REFRESH_SESSION_REPOSITORY_TOKEN,
+      useClass: RefreshSessionRepository,
     },
     LocalStrategy,
     JwtStrategy,
