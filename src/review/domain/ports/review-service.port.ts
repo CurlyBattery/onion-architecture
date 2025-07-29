@@ -6,6 +6,6 @@ export interface IReviewService {
   createReview(input: IReview): Promise<IReview>;
   getReviews(): Promise<IReview[]>;
   getReviewById(id: number): Promise<IReview>;
-  deleteReview(id: number): void;
+  deleteReview(id: number): Promise<{ message: string }>;
   updateReview(id: number, input: Partial<IReview>): Promise<IReview>;
 }

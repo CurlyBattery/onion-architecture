@@ -1,4 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { IUserService } from '../domain/ports/user-service.port';
 import { IUser } from '../domain/entities/user.entity';
 import {
@@ -12,19 +17,57 @@ export class UserUseCase implements IUserService {
     @Inject(USER_REPOSITORY_TOKEN) private readonly repository: IUserRepository,
   ) {}
 
-  async createUser(input: IUser): Promise<IUser> {
-    throw new Error('Method not implemented.');
+  async createUser(input: Omit<IUser, 'reviews'>): Promise<IUser> {
+    const existingUser = await this.repository.get({
+      where: { username: input.username },
+    });
+    if (existingUser) {
+      throw new ConflictException('User already exists');
+    }
+    return await this.repository.save({ data: input });
   }
-  getUserById(id: number): Promise<IUser> {
-    throw new Error('Method not implemented.');
+
+  async getUserById(id: number): Promise<IUser> {
+    const user = await this.repository.get({ where: { id } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
-  getUserByEmail(email: string): Promise<IUser> {
-    throw new Error('Method not implemented.');
+
+  async getUserByUsername(username: string): Promise<IUser> {
+    const user = await this.repository.get({ where: { username } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
-  deleteUser(id: number): void {
-    throw new Error('Method not implemented.');
+
+  async deleteUser(id: number): Promise<{ message: string }> {
+    const user = await this.repository.get({ where: { id } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    await this.repository.delete({ where: { id } });
+    return { message: 'Successfully deleted user' };
   }
-  updateUser(id: number, input: Partial<IUser>): Promise<IUser> {
-    throw new Error('Method not implemented.');
+
+  async updateUser(
+    id: number,
+    input: Partial<Omit<IUser, 'reviews'>>,
+  ): Promise<IUser> {
+    const user = await this.repository.get({ where: { id } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    if (input.username) {
+      const existsUser = await this.repository.get({
+        where: { username: input.username },
+      });
+      if (existsUser) {
+        throw new ConflictException('User already exists');
+      }
+    }
+    return await this.repository.update({ where: { id }, data: input });
   }
 }
