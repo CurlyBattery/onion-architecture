@@ -1,6 +1,7 @@
 import { UserUseCase } from './user-use-case.service';
 import { IUserRepository } from '../domain/ports/user-repository.port';
 import { IUser } from '../domain/entities/user.entity';
+import { UserUseCase } from './user.usecase';
 
 describe('UserUseCase', () => {
   let useCase: UserUseCase;
@@ -13,6 +14,7 @@ describe('UserUseCase', () => {
       getAll: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
+      deleteMany: jest.fn(),
     };
 
     useCase = new UserUseCase(mockRepository);

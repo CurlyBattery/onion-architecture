@@ -43,7 +43,7 @@ export class AuthUseCase implements IAuthService {
 
   async signUp(
     input: IUser,
-    clientMeta: any,
+    clientMeta: IClientMetadata,
     res: Response,
     fingerprint: string,
   ): Promise<ITokens> {
@@ -54,7 +54,7 @@ export class AuthUseCase implements IAuthService {
 
   async checkPassword(
     user: IUser,
-    clientMeta: any,
+    clientMeta: IClientMetadata,
     res: Response,
     fingerprint: string,
   ): Promise<ITokens> {
