@@ -198,7 +198,20 @@ export class AuthUseCase implements IAuthService {
     return this.issuingTokens(user, clientMeta, res, fingerprint);
   }
 
-  logout(input: Omit<ITokens, 'refreshToken'>): Promise<void> {
-    throw new Error('Method not implemented.');
+  async logout(
+    input: Omit<ITokens, 'accessToken'>,
+  ): Promise<{ message: string }> {
+    await this.refreshSessionRepository.delete({
+      where: { refreshToken: input.refreshToken },
+    });
+
+    return { message: 'Successfully logged out.' };
+  }
+
+  async validateToken({ refreshToken }: Omit<ITokens, 'accessToken'>) {
+    const refreshSession = await this.refreshSessionRepository.get({
+      where: { refreshToken },
+    });
+    return refreshSession !== null;
   }
 }

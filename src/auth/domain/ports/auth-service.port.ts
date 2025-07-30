@@ -26,5 +26,6 @@ export interface IAuthService {
     res: Response,
     fingerprint: string,
   ): Promise<ITokens>;
-  logout(input: Omit<ITokens, 'refreshToken'>): Promise<void>;
+  logout(input: Omit<ITokens, 'accessToken'>): Promise<{ message: string }>;
+  validateToken(input: Omit<ITokens, 'accessToken'>): Promise<boolean>;
 }

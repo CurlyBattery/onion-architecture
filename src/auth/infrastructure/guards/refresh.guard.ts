@@ -27,6 +27,13 @@ export class RefreshGuard extends AuthGuard('refresh') {
       throw new UnauthorizedException('Refresh session expired');
     }
 
+    const isValidRefreshToken = await this.authService.validateToken({
+      refreshToken,
+    });
+    if (!isValidRefreshToken) {
+      throw new UnauthorizedException('Refresh token is not valid');
+    }
+
     return true;
   }
 }

@@ -32,7 +32,7 @@ import {
 @Controller('auth')
 export class AuthController {
   constructor(
-    @Inject(AUTH_SERVICE_TOKEN) private readonly authService: IAuthService,
+    @Inject(AUTH_SERVICE_TOKEN) private readonly authUseCase: IAuthService,
   ) {}
 
   @Public()
@@ -46,7 +46,7 @@ export class AuthController {
       username: registrationDto.username,
       password: registrationDto.password,
     };
-    const { accessToken, refreshToken } = await this.authService.signUp(
+    const { accessToken, refreshToken } = await this.authUseCase.signUp(
       input,
       clientMeta,
       res,
@@ -65,7 +65,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
     @Body() loginDto: { fingerprint: string },
   ): Promise<ITokens> {
-    return this.authService.checkPassword(
+    return this.authUseCase.checkPassword(
       user,
       clientMeta,
       res,
@@ -87,11 +87,16 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
     @Body() loginDto: { fingerprint: string },
   ) {
-    return this.authService.refreshTokens(
+    return this.authUseCase.refreshTokens(
       { refreshToken },
       clientMeta,
       res,
       loginDto.fingerprint,
     );
+  }
+
+  @Post('log-out')
+  logout(@Cookie(REFRESH_TOKEN_COOKIE_NAME) refreshToken: string) {
+    return this.authUseCase.logout({ refreshToken });
   }
 }
