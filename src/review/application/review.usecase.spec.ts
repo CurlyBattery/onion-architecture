@@ -19,7 +19,11 @@ describe('ReviewUseCase', () => {
   });
 
   it('should create a review', async () => {
-    const input: IReview = { title: 'Test', content: 'Some content' };
+    const input: IReview = {
+      title: 'Test',
+      content: 'Some content',
+      userId: 1,
+    };
     const created: IReview = { id: 1, ...input };
 
     mockRepository.save.mockResolvedValue(created);
@@ -31,7 +35,9 @@ describe('ReviewUseCase', () => {
   });
 
   it('should get all reviews', async () => {
-    const reviews: IReview[] = [{ id: 1, title: 'Test', content: 'Test' }];
+    const reviews: IReview[] = [
+      { id: 1, title: 'Test', content: 'Test', userId: 1 },
+    ];
     mockRepository.getAll.mockResolvedValue(reviews);
 
     const result = await useCase.getReviews();
@@ -41,7 +47,12 @@ describe('ReviewUseCase', () => {
   });
 
   it('should get review by id', async () => {
-    const review: IReview = { id: 1, title: 'Title', content: 'Text' };
+    const review: IReview = {
+      id: 1,
+      title: 'Title',
+      content: 'Text',
+      userId: 1,
+    };
     mockRepository.get.mockResolvedValue(review);
 
     const result = await useCase.getReviewById(1);
@@ -51,7 +62,12 @@ describe('ReviewUseCase', () => {
   });
 
   it('should delete a review', async () => {
-    const review: IReview = { id: 1, title: 'Title', content: 'Text' };
+    const review: IReview = {
+      id: 1,
+      title: 'Title',
+      content: 'Text',
+      userId: 1,
+    };
     mockRepository.get.mockResolvedValue(review);
 
     mockRepository.delete.mockResolvedValue(undefined);
@@ -67,12 +83,14 @@ describe('ReviewUseCase', () => {
       id: 1,
       title: 'Old Title',
       content: 'Old Content',
+      userId: 1,
     };
 
     const updated: IReview = {
       id: 1,
       title: 'Updated Title',
       content: 'Updated Content',
+      userId: 1,
     };
 
     mockRepository.get.mockResolvedValueOnce(existsReview);

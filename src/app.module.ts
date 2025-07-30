@@ -3,6 +3,8 @@ import {
   PrismaModule,
   providePrismaClientExceptionFilter,
 } from 'nestjs-prisma';
+import * as Joi from 'joi';
+import { ConfigModule } from '@nestjs/config';
 
 import { ReviewModule } from './review/review.module';
 import { UserModule } from './user/user.module';
@@ -16,6 +18,15 @@ import { AuthModule } from './auth/auth.module';
     ReviewModule,
     UserModule,
     AuthModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+      validationSchema: Joi.object({
+        AT_SECRET: Joi.string().required(),
+        AT_EXPIRE_IN: Joi.string().required(),
+        RT_EXPIRE_IN: Joi.string().required(),
+      }),
+    }),
   ],
   providers: [providePrismaClientExceptionFilter()],
 })

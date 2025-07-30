@@ -10,10 +10,14 @@ import { DefaultArgs } from 'generated/prisma/runtime/library';
 export class ReviewRepository implements IReviewRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  deleteMany(params: { where: Prisma.ReviewWhereInput }): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+
   get(params: {
     where: Prisma.ReviewWhereUniqueInput;
     select?: Prisma.ReviewSelect<DefaultArgs>;
-    include?: any;
+    include?: Prisma.ReviewInclude;
   }): Promise<IReview> {
     const { where, select } = params;
     return this.prisma.review.findUnique({
@@ -32,34 +36,34 @@ export class ReviewRepository implements IReviewRepository {
   save(params: {
     data: Prisma.ReviewUncheckedCreateInput;
     select?: Prisma.ReviewSelect<DefaultArgs>;
-    include?: any;
+    include?: Prisma.ReviewInclude;
   }): Promise<IReview> {
-    const { data, select } = params;
+    const { data, select, include } = params;
     return this.prisma.review.create({
       data,
-      select,
+      ...(select ? { select } : include ? { include } : {}),
     });
   }
   update(params: {
     where: Prisma.ReviewWhereUniqueInput;
     data: Prisma.ReviewUpdateInput;
     select?: Prisma.ReviewSelect<DefaultArgs>;
-    include?: any;
+    include?: Prisma.ReviewInclude;
   }): Promise<IReview> {
-    const { where, data, select } = params;
+    const { where, data, select, include } = params;
     return this.prisma.review.update({
       where,
       data,
-      select,
+      ...(select ? { select } : include ? { include } : {}),
     });
   }
   getAll(params: {
     select?: Prisma.ReviewSelect<DefaultArgs>;
-    include?: any;
+    include?: Prisma.ReviewInclude;
   }): Promise<IReview[]> {
-    const { select } = params;
+    const { select, include } = params;
     return this.prisma.review.findMany({
-      select,
+      ...(select ? { select } : {}),
     });
   }
 }

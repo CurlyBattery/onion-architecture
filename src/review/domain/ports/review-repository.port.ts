@@ -7,9 +7,10 @@ export const REVIEW_REPOSITORY_TOKEN = 'REVIEW_REPOSITORY_TOKEN';
 export interface IReviewRepository
   extends IRepository<
     IReview,
+    Prisma.ReviewWhereInput,
     Prisma.ReviewWhereUniqueInput,
     Prisma.ReviewSelect,
-    any,
+    Prisma.ReviewInclude,
     Prisma.ReviewUncheckedCreateInput,
     Prisma.ReviewUpdateInput
   > {}

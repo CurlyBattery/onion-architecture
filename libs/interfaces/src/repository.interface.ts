@@ -1,27 +1,33 @@
 export interface IRepository<
   T,
   WhereInput,
+  WhereUniqueInput,
   Select,
   Include,
   CreateInput,
   UpdateInput,
 > {
   get(params: {
-    where: WhereInput;
+    where: WhereUniqueInput;
     select?: Select;
     include?: Include;
   }): Promise<T>;
-  delete(params: { where: WhereInput }): Promise<void>;
+  deleteMany(params: { where: WhereInput }): Promise<void>;
+  delete(params: { where: WhereUniqueInput }): Promise<void>;
   save(params: {
     data: CreateInput;
     select?: Select;
     include?: Include;
   }): Promise<T>;
   update(params: {
-    where: WhereInput;
+    where: WhereUniqueInput;
     data: UpdateInput;
     select?: Select;
     include?: Include;
   }): Promise<T>;
-  getAll(params: { select?: Select; include?: Include }): Promise<T[]>;
+  getAll(params: {
+    where?: WhereInput;
+    select?: Select;
+    include?: Include;
+  }): Promise<T[]>;
 }
