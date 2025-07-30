@@ -1,4 +1,10 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Response } from 'express';
@@ -16,6 +22,8 @@ import {
   REFRESH_SESSION_REPOSITORY_TOKEN,
 } from '../domain/ports/refresh-session-repository.port';
 import { IRefreshSession } from '../domain/entities/refresh-session.entity';
+import { IClientMetadata } from '@app/decorators';
+import { REFRESH_TOKEN_COOKIE_NAME } from '../infrastructure/guards/refresh.guard';
 
 @Injectable()
 export class AuthUseCase implements IAuthService {
@@ -104,7 +112,7 @@ export class AuthUseCase implements IAuthService {
       this.refreshTokenExpiresIn,
     );
 
-    res.cookie('refresh-cookie', refreshSession.refreshToken, {
+    res.cookie(REFRESH_TOKEN_COOKIE_NAME, refreshSession.refreshToken, {
       httpOnly: true,
       secure: true,
       maxAge: refreshSession.expiresIn,
@@ -161,8 +169,33 @@ export class AuthUseCase implements IAuthService {
     }
   }
 
-  refreshTokens(input: Omit<ITokens, 'accessToken'>): Promise<ITokens> {
-    throw new Error('Method not implemented.');
+  async refreshTokens(
+    { refreshToken }: Omit<ITokens, 'accessToken'>,
+    clientMeta: IClientMetadata,
+    res: Response,
+    fingerprint: string,
+  ): Promise<ITokens> {
+    const refreshSession = await this.refreshSessionRepository.get({
+      where: { refreshToken },
+    });
+
+    if (!refreshSession) {
+      throw new UnauthorizedException('Refresh session expired');
+    }
+    await this.refreshSessionRepository.delete({
+      where: { refreshToken },
+    });
+
+    if (fingerprint !== refreshSession.fingerprint) {
+      throw new UnauthorizedException('Invalid refresh session');
+    }
+
+    const user = await this.userUseCase.getUserById(refreshSession.userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return this.issuingTokens(user, clientMeta, res, fingerprint);
   }
 
   logout(input: Omit<ITokens, 'refreshToken'>): Promise<void> {

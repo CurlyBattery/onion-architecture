@@ -48,7 +48,7 @@ model RefreshSession {
   id           Int      @id @default(autoincrement())
   userId       Int      @map("user_id")
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  refreshToken String   @default(uuid()) @map("refresh_token")
+  refreshToken String   @unique @default(uuid()) @map("refresh_token")
   ua           String
   fingerprint  String
   ip           String

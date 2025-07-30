@@ -20,6 +20,11 @@ export interface IAuthService {
     fingerprint: string,
   ): Promise<ITokens>;
   validateUser(username: string, password: string): Promise<IUser>;
-  refreshTokens(input: Omit<ITokens, 'accessToken'>): Promise<ITokens>;
+  refreshTokens(
+    input: Omit<ITokens, 'accessToken'>,
+    clientMeta: IClientMetadata,
+    res: Response,
+    fingerprint: string,
+  ): Promise<ITokens>;
   logout(input: Omit<ITokens, 'refreshToken'>): Promise<void>;
 }

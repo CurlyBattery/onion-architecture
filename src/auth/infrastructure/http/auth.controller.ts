@@ -16,8 +16,18 @@ import {
 import { IUser } from '../../../user/domain/entities/user.entity';
 import { ITokens } from '../../domain/entities/tokens.entity';
 import { RegistrationDto } from '../../dto/registration.dto';
-import { User, Public, ClientMetadata, IClientMetadata } from '@app/decorators';
+import {
+  User,
+  Public,
+  ClientMetadata,
+  IClientMetadata,
+  Cookie,
+} from '@app/decorators';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
+import {
+  REFRESH_TOKEN_COOKIE_NAME,
+  RefreshGuard,
+} from '../guards/refresh.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -66,5 +76,22 @@ export class AuthController {
   @Get('authenticated')
   authenticated(@User() user: IUser) {
     return user;
+  }
+
+  @Public()
+  @UseGuards(RefreshGuard)
+  @Post('refresh')
+  refreshTokens(
+    @Cookie(REFRESH_TOKEN_COOKIE_NAME) refreshToken: string,
+    @ClientMetadata() clientMeta: IClientMetadata,
+    @Res({ passthrough: true }) res: Response,
+    @Body() loginDto: { fingerprint: string },
+  ) {
+    return this.authService.refreshTokens(
+      { refreshToken },
+      clientMeta,
+      res,
+      loginDto.fingerprint,
+    );
   }
 }
