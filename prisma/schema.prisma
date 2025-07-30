@@ -55,5 +55,6 @@ model RefreshSession {
   expiresIn    Int      @map("expires_in")
   createdAt    DateTime @default(now()) @map("created_at")
 
+  @@unique([userId, ip, ua, fingerprint])
   @@map("refresh_sessions")
 }

@@ -10,6 +10,10 @@ import { DefaultArgs } from 'generated/prisma/runtime/library';
 export class ReviewRepository implements IReviewRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  deleteMany(params: { where: Prisma.ReviewWhereInput }): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+
   get(params: {
     where: Prisma.ReviewWhereUniqueInput;
     select?: Prisma.ReviewSelect<DefaultArgs>;

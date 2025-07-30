@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Inject, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Post,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
+import { Response } from 'express';
 
 import {
   AUTH_SERVICE_TOKEN,
@@ -7,9 +16,8 @@ import {
 import { IUser } from '../../../user/domain/entities/user.entity';
 import { ITokens } from '../../domain/entities/tokens.entity';
 import { RegistrationDto } from '../../dto/registration.dto';
-import { User, Public } from '@app/decorators';
+import { User, Public, ClientMetadata, IClientMetadata } from '@app/decorators';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
-import { Fingerprint, IFingerprint } from 'nestjs-fingerprint';
 
 @Controller('auth')
 export class AuthController {
@@ -21,21 +29,38 @@ export class AuthController {
   @Post('sign-up')
   async signUp(
     @Body() registrationDto: RegistrationDto,
-    @Fingerprint() fp: IFingerprint,
+    @ClientMetadata() clientMeta: IClientMetadata,
+    @Res({ passthrough: true }) res: Response,
   ): Promise<ITokens> {
     const input: IUser = {
       username: registrationDto.username,
       password: registrationDto.password,
     };
+    const { accessToken, refreshToken } = await this.authService.signUp(
+      input,
+      clientMeta,
+      res,
+      registrationDto.fingerprint,
+    );
 
-    return this.authService.signUp(input, fp);
+    return { accessToken, refreshToken };
   }
 
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post('sign-in')
-  async signIn(@User() user: IUser): Promise<ITokens> {
-    return this.authService.checkPassword(user);
+  async signIn(
+    @User() user: IUser,
+    @ClientMetadata() clientMeta: IClientMetadata,
+    @Res({ passthrough: true }) res: Response,
+    @Body() loginDto: { fingerprint: string },
+  ): Promise<ITokens> {
+    return this.authService.checkPassword(
+      user,
+      clientMeta,
+      res,
+      loginDto.fingerprint,
+    );
   }
 
   @Get('authenticated')

@@ -8,6 +8,7 @@ export const REFRESH_SESSION_REPOSITORY_TOKEN =
 export interface IRefreshSessionRepository
   extends IRepository<
     IRefreshSession,
+    Prisma.RefreshSessionWhereInput,
     Prisma.RefreshSessionWhereUniqueInput,
     Prisma.RefreshSessionSelect,
     Prisma.RefreshSessionInclude,

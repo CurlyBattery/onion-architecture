@@ -15,4 +15,8 @@ export class RegistrationDto {
   @MinLength(6)
   @Validate(IsMatchPasswords)
   repeatPassword: string;
+
+  @IsString()
+  @IsNotEmpty()
+  fingerprint: string;
 }

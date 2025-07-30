@@ -8,6 +8,7 @@ export const USER_REPOSITORY_TOKEN = 'USER_REPOSITORY_TOKEN';
 export interface IUserRepository
   extends IRepository<
     IUser,
+    Prisma.UserWhereInput,
     Prisma.UserWhereUniqueInput,
     Prisma.UserSelect,
     Prisma.UserInclude,

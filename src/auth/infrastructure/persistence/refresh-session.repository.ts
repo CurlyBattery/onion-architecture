@@ -28,6 +28,14 @@ export class RefreshSessionRepository implements IRefreshSessionRepository {
       where,
     });
   }
+  async deleteMany(params: {
+    where: Prisma.RefreshSessionWhereInput;
+  }): Promise<void> {
+    const { where } = params;
+    await this.prisma.refreshSession.deleteMany({
+      where,
+    });
+  }
   save(params: {
     data: Prisma.RefreshSessionUncheckedCreateInput;
     select?: Prisma.RefreshSessionSelect<DefaultArgs>;
@@ -53,11 +61,13 @@ export class RefreshSessionRepository implements IRefreshSessionRepository {
     });
   }
   getAll(params: {
+    where?: Prisma.RefreshSessionWhereInput;
     select?: Prisma.RefreshSessionSelect<DefaultArgs>;
     include?: Prisma.RefreshSessionInclude<DefaultArgs>;
   }): Promise<IRefreshSession[]> {
-    const { select, include } = params;
+    const { where, select, include } = params;
     return this.prisma.refreshSession.findMany({
+      ...(where ? { where } : {}),
       ...(select ? { select } : {}),
       ...(include ? { include } : {}),
     });
