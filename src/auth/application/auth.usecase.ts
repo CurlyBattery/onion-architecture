@@ -193,7 +193,7 @@ export class AuthUseCase implements IAuthService {
       where: { refreshToken: input.refreshToken },
     });
 
-    return { message: 'Successfully logged out.' };
+    return { message: 'Successfully logged out' };
   }
 
   async validateToken({ refreshToken }: Omit<ITokens, 'accessToken'>) {
