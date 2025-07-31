@@ -1,4 +1,3 @@
-import { UserUseCase } from './user-use-case.service';
 import { IUserRepository } from '../domain/ports/user-repository.port';
 import { IUser } from '../domain/entities/user.entity';
 import { UserUseCase } from './user.usecase';

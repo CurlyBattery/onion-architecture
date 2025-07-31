@@ -5,6 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { IUser } from '../../user/domain/entities/user.entity';
 import { IClientMetadata } from '@app/decorators';
+import { IRefreshSession } from '../domain/entities/refresh-session.entity';
 
 describe('AuthUseCase', () => {
   let useCase: AuthUseCase;
@@ -51,6 +52,45 @@ describe('AuthUseCase', () => {
 
   it('should sign up user', async () => {
     const input: IUser = { username: 'Artem', password: '1234567' };
-    let clientData: IClientMetadata;
+    const created: IUser = { id: 1, ...input, role: 'Reviewer' };
+    mockUserUseCase.createUser.mockResolvedValue(created);
+
+    const fingerprint = 'rfrfrfrfrfrrfr';
+    const clientData: IClientMetadata = {
+      userAgent: 'Chrome',
+      ip: '127.0.0.1',
+    };
+    const expiresIn = 12345;
+    mockConfigService.get.mockReturnValue(expiresIn);
+
+    const createdRefreshSession: IRefreshSession = {
+      id: 1,
+      ua: clientData.userAgent,
+      fingerprint,
+      ip: clientData.ip,
+      refreshToken: 'uuid',
+      expiresIn,
+      userId: created.id,
+    };
+
+    mockJwtService.sign.mockReturnValue('access_token');
+    mockRepository.save.mockResolvedValue(createdRefreshSession);
+
+    const result = await useCase.signUp(input, clientData, res, fingerprint);
+
+    expect(mockUserUseCase.createUser).toHaveBeenCalledWith(input);
+
+    expect(mockJwtService.sign).toHaveBeenCalledWith(
+      {
+        sub: created.id,
+        role: created.role,
+      },
+      expect.any(Object),
+    );
+
+    expect(result).toEqual({
+      accessToken: 'access_token',
+      refreshToken: 'uuid',
+    });
   });
 });

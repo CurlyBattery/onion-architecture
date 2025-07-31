@@ -49,9 +49,13 @@ export class AuthController {
     const { accessToken, refreshToken } = await this.authUseCase.signUp(
       input,
       clientMeta,
-      res,
       registrationDto.fingerprint,
     );
+
+    const { name, value, options } =
+      this.authUseCase.getRefreshTokenCookie(refreshToken);
+
+    res.cookie(name, value, options);
 
     return { accessToken, refreshToken };
   }
@@ -65,12 +69,18 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
     @Body() loginDto: { fingerprint: string },
   ): Promise<ITokens> {
-    return this.authUseCase.checkPassword(
+    const { accessToken, refreshToken } = await this.authUseCase.checkPassword(
       user,
       clientMeta,
-      res,
       loginDto.fingerprint,
     );
+
+    const { name, value, options } =
+      this.authUseCase.getRefreshTokenCookie(refreshToken);
+
+    res.cookie(name, value, options);
+
+    return { accessToken, refreshToken };
   }
 
   @Get('authenticated')
@@ -81,18 +91,28 @@ export class AuthController {
   @Public()
   @UseGuards(RefreshGuard)
   @Post('refresh')
-  refreshTokens(
+  async refreshTokens(
     @Cookie(REFRESH_TOKEN_COOKIE_NAME) refreshToken: string,
     @ClientMetadata() clientMeta: IClientMetadata,
     @Res({ passthrough: true }) res: Response,
     @Body() loginDto: { fingerprint: string },
   ) {
-    return this.authUseCase.refreshTokens(
+    const refreshSession = await this.authUseCase.refreshTokens(
       { refreshToken },
       clientMeta,
-      res,
       loginDto.fingerprint,
     );
+
+    const { name, value, options } = this.authUseCase.getRefreshTokenCookie(
+      refreshSession.refreshToken,
+    );
+
+    res.cookie(name, value, options);
+
+    return {
+      accessToken: refreshSession.accessToken,
+      refreshToken: refreshSession.refreshToken,
+    };
   }
 
   @Post('log-out')

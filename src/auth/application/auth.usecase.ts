@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Inject,
   Injectable,
   NotFoundException,
@@ -7,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { Response } from 'express';
+import { CookieOptions, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 
 import {
@@ -44,18 +43,16 @@ export class AuthUseCase implements IAuthService {
   async signUp(
     input: IUser,
     clientMeta: IClientMetadata,
-    res: Response,
     fingerprint: string,
   ): Promise<ITokens> {
     const user = await this.userUseCase.createUser(input);
 
-    return await this.issuingTokens(user, clientMeta, res, fingerprint);
+    return await this.issuingTokens(user, clientMeta, fingerprint);
   }
 
   async checkPassword(
     user: IUser,
     clientMeta: IClientMetadata,
-    res: Response,
     fingerprint: string,
   ): Promise<ITokens> {
     const sessions = await this.refreshSessionRepository.getAll({
@@ -94,13 +91,12 @@ export class AuthUseCase implements IAuthService {
       });
     }
 
-    return await this.issuingTokens(user, clientMeta, res, fingerprint);
+    return await this.issuingTokens(user, clientMeta, fingerprint);
   }
 
   private async issuingTokens(
     user: IUser,
     clientMeta: any,
-    res: Response,
     fingerprint: string,
   ) {
     const accessToken = await this.generateAccessToken(user);
@@ -111,13 +107,6 @@ export class AuthUseCase implements IAuthService {
       clientMeta.userAgent,
       this.refreshTokenExpiresIn,
     );
-
-    res.cookie(REFRESH_TOKEN_COOKIE_NAME, refreshSession.refreshToken, {
-      httpOnly: true,
-      secure: true,
-      maxAge: refreshSession.expiresIn,
-      path: '/api/auth',
-    });
 
     return { accessToken, refreshToken: refreshSession.refreshToken };
   }
@@ -172,7 +161,6 @@ export class AuthUseCase implements IAuthService {
   async refreshTokens(
     { refreshToken }: Omit<ITokens, 'accessToken'>,
     clientMeta: IClientMetadata,
-    res: Response,
     fingerprint: string,
   ): Promise<ITokens> {
     const refreshSession = await this.refreshSessionRepository.get({
@@ -195,7 +183,7 @@ export class AuthUseCase implements IAuthService {
       throw new NotFoundException('User not found');
     }
 
-    return this.issuingTokens(user, clientMeta, res, fingerprint);
+    return this.issuingTokens(user, clientMeta, fingerprint);
   }
 
   async logout(
@@ -213,5 +201,22 @@ export class AuthUseCase implements IAuthService {
       where: { refreshToken },
     });
     return refreshSession !== null;
+  }
+
+  getRefreshTokenCookie(refreshToken: string): {
+    name: string;
+    value: string;
+    options: CookieOptions;
+  } {
+    return {
+      name: REFRESH_TOKEN_COOKIE_NAME,
+      value: refreshToken,
+      options: {
+        httpOnly: true,
+        secure: true,
+        maxAge: this.refreshTokenExpiresIn,
+        path: '/api/auth',
+      },
+    };
   }
 }
