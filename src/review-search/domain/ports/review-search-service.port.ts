@@ -7,4 +7,5 @@ export interface IReviewSearchService {
   indexReview(review: Omit<IReview, 'user' | 'views'>): any;
   search(text: string): Promise<ReviewSearchBody[]>;
   remove(reviewId: number): Promise<void>;
+  update(review: Omit<IReview, 'user' | 'views'>): any;
 }

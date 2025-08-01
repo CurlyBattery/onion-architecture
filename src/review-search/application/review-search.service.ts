@@ -61,4 +61,28 @@ export class ReviewSearchService implements IReviewSearchService {
       },
     });
   }
+
+  update(review: Omit<IReview, 'user' | 'views'>) {
+    const newBody: ReviewSearchBody = {
+      id: review.id,
+      title: review.title,
+      content: review.content,
+      userId: review.userId.toString(),
+    };
+
+    const script = Object.entries(newBody).reduce((result, [key, value]) => {
+      return `${result} ctx._source.${key}='${value}';`;
+    }, '');
+    console.log(script);
+
+    return this.elasticsearchService.updateByQuery({
+      index: this.index,
+      query: {
+        match: {
+          id: review.id,
+        },
+      },
+      script,
+    });
+  }
 }

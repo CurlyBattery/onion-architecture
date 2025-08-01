@@ -1,5 +1,5 @@
 export interface ReviewSearchBody {
-  id: number; // не optional
+  id: number;
   title: string;
   content: string;
   userId: string;

@@ -132,6 +132,11 @@ export class ReviewUseCase implements IReviewService {
         throw new ReviewConflictException();
       }
     }
-    return await this.repository.update({ where: { id }, data: input });
+    const updatedReview = await this.repository.update({
+      where: { id },
+      data: input,
+    });
+    await this.reviewsSearchService.update(updatedReview);
+    return updatedReview;
   }
 }
