@@ -12,6 +12,8 @@ import { AuthModule } from './auth/auth.module';
 import { EmailModule } from './email/email.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EmailSchedulingModule } from './email-scheduling/email-scheduling.module';
+import { SearchModule } from './search/search.module';
+import { ReviewSearchModule } from './review-search/review-search.module';
 
 @Module({
   imports: [
@@ -31,11 +33,16 @@ import { EmailSchedulingModule } from './email-scheduling/email-scheduling.modul
         EMAIL_SERVICE: Joi.string().required(),
         EMAIL_USER: Joi.string().required(),
         EMAIL_PASSWORD: Joi.string().required(),
+        ELASTICSEARCH_NODE: Joi.string().required(),
+        ELASTICSEARCH_USERNAME: Joi.string().required(),
+        ELASTICSEARCH_PASSWORD: Joi.string().required(),
       }),
     }),
     EmailModule,
     ScheduleModule.forRoot(),
     EmailSchedulingModule,
+    SearchModule,
+    ReviewSearchModule,
   ],
   providers: [providePrismaClientExceptionFilter()],
 })

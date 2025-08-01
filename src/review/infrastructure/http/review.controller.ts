@@ -1,5 +1,6 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -7,6 +8,8 @@ import {
   Param,
   Patch,
   Post,
+  Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   IReviewService,
@@ -17,9 +20,9 @@ import { FindOneParams } from '@app/types';
 import { UpdateReviewDto } from '../../dto/update-review.dto';
 import { IReview } from '../../domain/entities/review.entity';
 import { User } from '@app/decorators';
-import { IUser } from '../../../user/domain/entities/user.entity';
 
 @Controller('review')
+@UseInterceptors(ClassSerializerInterceptor)
 export class ReviewController {
   constructor(
     @Inject(REVIEW_SERVICE_TOKEN)
@@ -41,7 +44,10 @@ export class ReviewController {
   }
 
   @Get()
-  getReviews() {
+  getReviews(@Query('search') search: string) {
+    if (search) {
+      return this.reviewService.searchForReviews(search);
+    }
     return this.reviewService.getReviews();
   }
 

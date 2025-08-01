@@ -5,8 +5,11 @@ import { REVIEW_SERVICE_TOKEN } from './domain/ports/review-service.port';
 import { REVIEW_REPOSITORY_TOKEN } from './domain/ports/review-repository.port';
 import { ReviewRepository } from './infrastructure/persistence/review.repository';
 import { ReviewUseCase } from './application/review.usecase';
+import { ReviewSearchModule } from '../review-search/review-search.module';
+import { SearchModule } from '../search/search.module';
 
 @Module({
+  imports: [ReviewSearchModule, SearchModule],
   controllers: [ReviewController],
   providers: [
     {

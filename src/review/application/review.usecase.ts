@@ -8,12 +8,14 @@ import {
 import { IReview } from '../domain/entities/review.entity';
 import { ReviewNotFoundException } from '../domain/exceptions/review-not-found.exception';
 import { ReviewConflictException } from '../domain/exceptions/review-conflict.exception';
+import { ReviewSearchService } from '../../review-search/review-search.service';
 
 @Injectable()
 export class ReviewUseCase implements IReviewService {
   constructor(
     @Inject(REVIEW_REPOSITORY_TOKEN)
     private readonly repository: IReviewRepository,
+    private readonly reviewsSearchService: ReviewSearchService,
   ) {}
 
   async viewReview(reviewId: number, userId: number): Promise<IReview> {
@@ -65,7 +67,9 @@ export class ReviewUseCase implements IReviewService {
     if (existsReview) {
       throw new ReviewConflictException();
     }
-    return await this.repository.save({ data: input });
+    const newReview = await this.repository.save({ data: input });
+    await this.reviewsSearchService.indexReview(newReview);
+    return newReview;
   }
 
   async getReviews(): Promise<IReview[]> {
@@ -73,6 +77,18 @@ export class ReviewUseCase implements IReviewService {
       include: {
         _count: true,
       },
+    });
+    return reviews;
+  }
+
+  async searchForReviews(text: string): Promise<IReview[]> {
+    const results = await this.reviewsSearchService.search(text);
+    const ids = results.map((result) => result.id);
+    if (!ids.length) {
+      return [];
+    }
+    const reviews = await this.repository.getAll({
+      where: { id: { in: ids } },
     });
     return reviews;
   }

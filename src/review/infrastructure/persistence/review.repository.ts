@@ -58,9 +58,11 @@ export class ReviewRepository implements IReviewRepository {
     select?: Prisma.ReviewSelect<DefaultArgs>;
     include?: Prisma.ReviewInclude;
     take?: number;
+    where?: Prisma.ReviewWhereInput;
   }): Promise<IReview[]> {
-    const { select, include, take } = params;
+    const { where, select, include, take } = params;
     return this.prisma.review.findMany({
+      where,
       take,
       ...(include ? { include } : {}),
     });
