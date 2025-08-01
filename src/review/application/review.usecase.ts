@@ -8,14 +8,19 @@ import {
 import { IReview } from '../domain/entities/review.entity';
 import { ReviewNotFoundException } from '../domain/exceptions/review-not-found.exception';
 import { ReviewConflictException } from '../domain/exceptions/review-conflict.exception';
-import { ReviewSearchService } from '../../review-search/review-search.service';
+import { ReviewSearchService } from '../../review-search/application/review-search.service';
+import {
+  IReviewSearchService,
+  REVIEW_SEARCH_SERVICE_TOKEN,
+} from '../../review-search/domain/ports/review-search-service.port';
 
 @Injectable()
 export class ReviewUseCase implements IReviewService {
   constructor(
     @Inject(REVIEW_REPOSITORY_TOKEN)
     private readonly repository: IReviewRepository,
-    private readonly reviewsSearchService: ReviewSearchService,
+    @Inject(REVIEW_SEARCH_SERVICE_TOKEN)
+    private readonly reviewsSearchService: IReviewSearchService,
   ) {}
 
   async viewReview(reviewId: number, userId: number): Promise<IReview> {
@@ -107,6 +112,7 @@ export class ReviewUseCase implements IReviewService {
       throw new ReviewNotFoundException();
     }
     await this.repository.delete({ where: { id } });
+    await this.reviewsSearchService.remove(id);
     return { message: 'Successfully deleted review' };
   }
 

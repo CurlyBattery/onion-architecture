@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 
-import { IReview } from '../review/domain/entities/review.entity';
-import { ReviewSearchResult } from '../review/dto/review-search-result.dto';
-import { ReviewSearchBody } from '../review/dto/review-search-body.dto';
+import { IReview } from '../../review/domain/entities/review.entity';
+import { ReviewSearchBody } from '../../review/dto/review-search-body.dto';
+import { IReviewSearchService } from '../domain/ports/review-search-service.port';
 
 @Injectable()
-export class ReviewSearchService {
+export class ReviewSearchService implements IReviewSearchService {
   index = 'reviews';
 
   constructor(private readonly elasticsearchService: ElasticsearchService) {}
@@ -49,5 +49,16 @@ export class ReviewSearchService {
     });
 
     return hits.hits.map((hit) => hit._source);
+  }
+
+  async remove(reviewId: number): Promise<void> {
+    await this.elasticsearchService.deleteByQuery({
+      index: this.index,
+      query: {
+        match: {
+          id: reviewId,
+        },
+      },
+    });
   }
 }
