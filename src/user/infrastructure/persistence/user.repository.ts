@@ -9,10 +9,6 @@ import { PrismaService } from 'nestjs-prisma';
 export class UserRepository implements IUserRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  deleteMany(params: { where: Prisma.UserWhereInput }): Promise<void> {
-    throw new Error('Method not implemented.');
-  }
-
   get(params: {
     where: Prisma.UserWhereUniqueInput;
     select?: Prisma.UserSelect<DefaultArgs>;

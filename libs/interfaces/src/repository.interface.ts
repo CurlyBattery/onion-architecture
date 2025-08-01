@@ -12,7 +12,6 @@ export interface IRepository<
     select?: Select;
     include?: Include;
   }): Promise<T>;
-  deleteMany(params: { where: WhereInput }): Promise<void>;
   delete(params: { where: WhereUniqueInput }): Promise<void>;
   save(params: {
     data: CreateInput;
@@ -29,5 +28,6 @@ export interface IRepository<
     where?: WhereInput;
     select?: Select;
     include?: Include;
+    take?: number;
   }): Promise<T[]>;
 }

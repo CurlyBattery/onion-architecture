@@ -23,18 +23,51 @@ model Review {
   title   String @unique
   content String
   userId  Int    @map("user_id")
-  user    User   @relation(references: [id], fields: [userId], onDelete: Cascade)
+
+  user  User         @relation(references: [id], fields: [userId], onDelete: Cascade)
+  likes ReviewLike[]
+  views ReviewView[]
 
   @@map("reviews")
 }
 
+model ReviewLike {
+  id        Int      @id @default(autoincrement())
+  reviewId  Int      @map("review_id")
+  userId    Int      @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([reviewId, userId])
+  @@map("review_likes")
+}
+
+model ReviewView {
+  id        Int      @id @default(autoincrement())
+  reviewId  Int      @map("review_id")
+  userId    Int      @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([reviewId, userId])
+  @@map("review_views")
+}
+
 model User {
-  id              Int              @id @default(autoincrement())
-  username        String           @unique
-  password        String
-  role            Role             @default(Reviewer)
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  password String
+  email    String @unique
+  role     Role   @default(Reviewer)
+
   reviews         Review[]
   refreshSessions RefreshSession[]
+  likes           ReviewLike[]
+  views           ReviewView[]
 
   @@map("users")
 }
@@ -47,13 +80,14 @@ enum Role {
 model RefreshSession {
   id           Int      @id @default(autoincrement())
   userId       Int      @map("user_id")
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   refreshToken String   @unique @default(uuid()) @map("refresh_token")
   ua           String
   fingerprint  String
   ip           String
   expiresIn    Int      @map("expires_in")
   createdAt    DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, ip, ua, fingerprint])
   @@map("refresh_sessions")

@@ -8,4 +8,7 @@ export interface IReviewService {
   getReviewById(id: number): Promise<IReview>;
   deleteReview(id: number): Promise<{ message: string }>;
   updateReview(id: number, input: Partial<IReview>): Promise<IReview>;
+  viewReview(reviewId: number, userId: number): Promise<IReview>;
+  getPopularRecords(): Promise<IReview[]>;
+  searchForReviews(text: string): Promise<IReview[]>;
 }

@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Inject,
   Injectable,
   NotFoundException,
@@ -7,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { Response } from 'express';
+import { CookieOptions } from 'express';
 import { ConfigService } from '@nestjs/config';
 
 import {
@@ -24,6 +23,14 @@ import {
 import { IRefreshSession } from '../domain/entities/refresh-session.entity';
 import { IClientMetadata } from '@app/decorators';
 import { REFRESH_TOKEN_COOKIE_NAME } from '../infrastructure/guards/refresh.guard';
+import {
+  EMAIL_SCHEDULING_SERVICE_TOKEN,
+  IEmailSchedulingService,
+} from '../../email-scheduling/domain/ports/email-scheduling-service.port';
+import {
+  IReviewService,
+  REVIEW_SERVICE_TOKEN,
+} from '../../review/domain/ports/review-service.port';
 
 @Injectable()
 export class AuthUseCase implements IAuthService {
@@ -33,6 +40,10 @@ export class AuthUseCase implements IAuthService {
     @Inject(USER_SERVICE_TOKEN) private readonly userUseCase: IUserService,
     @Inject(REFRESH_SESSION_REPOSITORY_TOKEN)
     private readonly refreshSessionRepository: IRefreshSessionRepository,
+    @Inject(EMAIL_SCHEDULING_SERVICE_TOKEN)
+    private readonly emailSchedulingService: IEmailSchedulingService,
+    @Inject(REVIEW_SERVICE_TOKEN)
+    private readonly reviewUseCase: IReviewService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {
@@ -43,19 +54,25 @@ export class AuthUseCase implements IAuthService {
 
   async signUp(
     input: IUser,
-    clientMeta: any,
-    res: Response,
+    clientMeta: IClientMetadata,
     fingerprint: string,
+    isReceiveLetters: boolean,
   ): Promise<ITokens> {
     const user = await this.userUseCase.createUser(input);
 
-    return await this.issuingTokens(user, clientMeta, res, fingerprint);
+    if (isReceiveLetters) {
+      await this.emailSchedulingService.scheduleEmail({
+        recipient: input.email,
+        subject: 'Review App',
+      });
+    }
+
+    return await this.issuingTokens(user, clientMeta, fingerprint);
   }
 
   async checkPassword(
     user: IUser,
-    clientMeta: any,
-    res: Response,
+    clientMeta: IClientMetadata,
     fingerprint: string,
   ): Promise<ITokens> {
     const sessions = await this.refreshSessionRepository.getAll({
@@ -94,13 +111,12 @@ export class AuthUseCase implements IAuthService {
       });
     }
 
-    return await this.issuingTokens(user, clientMeta, res, fingerprint);
+    return await this.issuingTokens(user, clientMeta, fingerprint);
   }
 
   private async issuingTokens(
     user: IUser,
     clientMeta: any,
-    res: Response,
     fingerprint: string,
   ) {
     const accessToken = await this.generateAccessToken(user);
@@ -111,13 +127,6 @@ export class AuthUseCase implements IAuthService {
       clientMeta.userAgent,
       this.refreshTokenExpiresIn,
     );
-
-    res.cookie(REFRESH_TOKEN_COOKIE_NAME, refreshSession.refreshToken, {
-      httpOnly: true,
-      secure: true,
-      maxAge: refreshSession.expiresIn,
-      path: '/api/auth',
-    });
 
     return { accessToken, refreshToken: refreshSession.refreshToken };
   }
@@ -172,7 +181,6 @@ export class AuthUseCase implements IAuthService {
   async refreshTokens(
     { refreshToken }: Omit<ITokens, 'accessToken'>,
     clientMeta: IClientMetadata,
-    res: Response,
     fingerprint: string,
   ): Promise<ITokens> {
     const refreshSession = await this.refreshSessionRepository.get({
@@ -195,7 +203,7 @@ export class AuthUseCase implements IAuthService {
       throw new NotFoundException('User not found');
     }
 
-    return this.issuingTokens(user, clientMeta, res, fingerprint);
+    return this.issuingTokens(user, clientMeta, fingerprint);
   }
 
   async logout(
@@ -205,7 +213,7 @@ export class AuthUseCase implements IAuthService {
       where: { refreshToken: input.refreshToken },
     });
 
-    return { message: 'Successfully logged out.' };
+    return { message: 'Successfully logged out' };
   }
 
   async validateToken({ refreshToken }: Omit<ITokens, 'accessToken'>) {
@@ -213,5 +221,22 @@ export class AuthUseCase implements IAuthService {
       where: { refreshToken },
     });
     return refreshSession !== null;
+  }
+
+  getRefreshTokenCookie(refreshToken: string): {
+    name: string;
+    value: string;
+    options: CookieOptions;
+  } {
+    return {
+      name: REFRESH_TOKEN_COOKIE_NAME,
+      value: refreshToken,
+      options: {
+        httpOnly: true,
+        secure: true,
+        maxAge: this.refreshTokenExpiresIn,
+        path: '/api/auth',
+      },
+    };
   }
 }

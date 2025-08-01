@@ -5,14 +5,11 @@ import { IReviewRepository } from '../../domain/ports/review-repository.port';
 import { IReview } from '../../domain/entities/review.entity';
 import { Prisma } from 'generated/prisma';
 import { DefaultArgs } from 'generated/prisma/runtime/library';
+import { IReviewView } from 'src/review/domain/entities/review-view.entity';
 
 @Injectable()
 export class ReviewRepository implements IReviewRepository {
   constructor(private readonly prisma: PrismaService) {}
-
-  deleteMany(params: { where: Prisma.ReviewWhereInput }): Promise<void> {
-    throw new Error('Method not implemented.');
-  }
 
   get(params: {
     where: Prisma.ReviewWhereUniqueInput;
@@ -60,10 +57,35 @@ export class ReviewRepository implements IReviewRepository {
   getAll(params: {
     select?: Prisma.ReviewSelect<DefaultArgs>;
     include?: Prisma.ReviewInclude;
+    take?: number;
+    where?: Prisma.ReviewWhereInput;
   }): Promise<IReview[]> {
-    const { select, include } = params;
+    const { where, select, include, take } = params;
     return this.prisma.review.findMany({
-      ...(select ? { select } : {}),
+      where,
+      take,
+      ...(include ? { include } : {}),
+    });
+  }
+
+  getUniqueViews(params: {
+    where: Prisma.ReviewViewWhereUniqueInput;
+    select?: Prisma.ReviewViewSelect<DefaultArgs>;
+    include?: Prisma.ReviewViewInclude<DefaultArgs>;
+  }) {
+    const { select, include, where } = params;
+    return this.prisma.reviewView.findUnique({
+      where,
+      ...(select ? { select } : include ? { include } : {}),
+    });
+  }
+
+  saveView(params: {
+    data: Prisma.ReviewViewUncheckedCreateInput;
+  }): Promise<IReviewView> {
+    const { data } = params;
+    return this.prisma.reviewView.create({
+      data,
     });
   }
 }
