@@ -16,7 +16,49 @@ export class ReviewUseCase implements IReviewService {
     private readonly repository: IReviewRepository,
   ) {}
 
-  async createReview(input: IReview): Promise<IReview> {
+  async viewReview(reviewId: number, userId: number): Promise<IReview> {
+    const existingView = await this.repository.getUniqueViews({
+      where: { reviewId_userId: { reviewId, userId } },
+    });
+
+    if (!existingView) {
+      await this.repository.saveView({
+        data: {
+          reviewId,
+          userId,
+        },
+      });
+    }
+
+    return await this.repository.get({
+      where: { id: reviewId },
+      include: {
+        likes: true,
+        views: true,
+      },
+    });
+  }
+
+  async getPopularRecords(): Promise<IReview[]> {
+    const reviews = await this.repository.getAll({
+      include: {
+        views: true,
+      },
+    });
+
+    const filtered = reviews
+      .map((review) => ({
+        ...review,
+        viewsCount: review.views.length,
+      }))
+      .filter((review) => review.viewsCount > 10)
+      .sort((a, b) => b.viewsCount - a.viewsCount)
+      .slice(0, 10);
+
+    return filtered;
+  }
+
+  async createReview(input: Omit<IReview, 'views'>): Promise<IReview> {
     const existsReview = await this.repository.get({
       where: { title: input.title },
     });
@@ -27,7 +69,12 @@ export class ReviewUseCase implements IReviewService {
   }
 
   async getReviews(): Promise<IReview[]> {
-    return await this.repository.getAll({});
+    const reviews = await this.repository.getAll({
+      include: {
+        _count: true,
+      },
+    });
+    return reviews;
   }
 
   async getReviewById(id: number): Promise<IReview> {
@@ -49,7 +96,7 @@ export class ReviewUseCase implements IReviewService {
 
   async updateReview(
     id: number,
-    input: Partial<Omit<IReview, 'userId' | 'user'>>,
+    input: Partial<Omit<IReview, 'userId' | 'user' | 'views'>>,
   ): Promise<IReview> {
     const review = await this.repository.get({ where: { id } });
     if (!review) {

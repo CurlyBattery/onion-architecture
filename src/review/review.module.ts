@@ -18,5 +18,6 @@ import { ReviewUseCase } from './application/review.usecase';
       useClass: ReviewRepository,
     },
   ],
+  exports: [REVIEW_SERVICE_TOKEN],
 })
 export class ReviewModule {}

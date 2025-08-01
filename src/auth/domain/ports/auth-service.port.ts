@@ -11,6 +11,7 @@ export interface IAuthService {
     input: IUser,
     clientMeta: IClientMetadata,
     fingerprint: string,
+    isReceiveLetters: boolean,
   ): Promise<ITokens>;
   checkPassword(
     input: IUser,

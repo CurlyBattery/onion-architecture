@@ -16,6 +16,8 @@ import { CreateReviewDto } from '../../dto/create-review.dto';
 import { FindOneParams } from '@app/types';
 import { UpdateReviewDto } from '../../dto/update-review.dto';
 import { IReview } from '../../domain/entities/review.entity';
+import { User } from '@app/decorators';
+import { IUser } from '../../../user/domain/entities/user.entity';
 
 @Controller('review')
 export class ReviewController {
@@ -25,11 +27,14 @@ export class ReviewController {
   ) {}
 
   @Post()
-  createReview(@Body() createReviewDto: CreateReviewDto) {
+  createReview(
+    @Body() createReviewDto: CreateReviewDto,
+    @User('userId') userId: number,
+  ) {
     const review: IReview = {
       title: createReviewDto.title,
       content: createReviewDto.content,
-      userId: 1,
+      userId,
     };
 
     return this.reviewService.createReview(review);
@@ -61,5 +66,10 @@ export class ReviewController {
     };
 
     return this.reviewService.updateReview(id, update);
+  }
+
+  @Get(':id/view')
+  viewReview(@Param('id') id: number, @User('userId') userId: number) {
+    return this.reviewService.viewReview(Number(id), userId);
   }
 }

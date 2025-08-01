@@ -1,11 +1,17 @@
 import { Module } from '@nestjs/common';
-import { EmailSchedulingService } from './email-scheduling.service';
-import { EmailSchedulingController } from './email-scheduling.controller';
 import { EmailModule } from '../email/email.module';
+import { EmailSchedulingService } from './application/email-scheduling.service';
+import { EMAIL_SCHEDULING_SERVICE_TOKEN } from './domain/ports/email-scheduling-service.port';
+import { ReviewModule } from '../review/review.module';
 
 @Module({
-  imports: [EmailModule],
-  controllers: [EmailSchedulingController],
-  providers: [EmailSchedulingService],
+  imports: [EmailModule, ReviewModule],
+  providers: [
+    {
+      provide: EMAIL_SCHEDULING_SERVICE_TOKEN,
+      useClass: EmailSchedulingService,
+    },
+  ],
+  exports: [EMAIL_SCHEDULING_SERVICE_TOKEN],
 })
 export class EmailSchedulingModule {}

@@ -14,4 +14,6 @@ export interface IRefreshSessionRepository
     Prisma.RefreshSessionInclude,
     Prisma.RefreshSessionUncheckedCreateInput,
     Prisma.RefreshSessionUpdateInput
-  > {}
+  > {
+  deleteMany(params: { where: Prisma.RefreshSessionWhereInput }): Promise<void>;
+}

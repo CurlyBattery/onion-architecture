@@ -45,11 +45,13 @@ export class AuthController {
     const input: IUser = {
       username: registrationDto.username,
       password: registrationDto.password,
+      email: registrationDto.email,
     };
     const { accessToken, refreshToken } = await this.authUseCase.signUp(
       input,
       clientMeta,
       registrationDto.fingerprint,
+      registrationDto.isReceiveLetters,
     );
 
     const { name, value, options } =

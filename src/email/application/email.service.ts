@@ -2,22 +2,23 @@ import { Injectable } from '@nestjs/common';
 import * as Mail from 'nodemailer/lib/mailer';
 import { ConfigService } from '@nestjs/config';
 import { createTransport } from 'nodemailer';
+import { IEmailService } from '../domain/ports/email-service.port';
 
 @Injectable()
-export class EmailService {
+export class EmailService implements IEmailService {
   private readonly nodemailerTransport: Mail;
 
   constructor(private readonly configService: ConfigService) {
     this.nodemailerTransport = createTransport({
-      service: configService.get<string>('EMAIL_SERVICE'),
+      service: this.configService.get<string>('EMAIL_SERVICE'),
       auth: {
-        user: configService.get<string>('EMAIL_USER'),
-        pass: configService.get<string>('EMAIL_PASSWORD'),
+        user: this.configService.get<string>('EMAIL_USER'),
+        pass: this.configService.get<string>('EMAIL_PASSWORD'),
       },
     });
   }
 
-  sendMail(options: Mail.Options) {
+  sendEmail(options: Mail.Options): Promise<any> {
     return this.nodemailerTransport.sendMail(options);
   }
 }

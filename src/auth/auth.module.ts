@@ -12,8 +12,9 @@ import { JwtStrategy } from './infrastructure/strategies/jwt.strategy';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './infrastructure/guards/jwt-auth.guard';
 import { RefreshSessionRepository } from './infrastructure/persistence/refresh-session.repository';
-import { USER_REPOSITORY_TOKEN } from '../user/domain/ports/user-repository.port';
 import { REFRESH_SESSION_REPOSITORY_TOKEN } from './domain/ports/refresh-session-repository.port';
+import { EmailSchedulingModule } from '../email-scheduling/email-scheduling.module';
+import { ReviewModule } from '../review/review.module';
 
 @Module({
   imports: [
@@ -28,6 +29,8 @@ import { REFRESH_SESSION_REPOSITORY_TOKEN } from './domain/ports/refresh-session
       inject: [ConfigService],
     }),
     PassportModule,
+    EmailSchedulingModule,
+    ReviewModule,
   ],
   controllers: [AuthController],
   providers: [

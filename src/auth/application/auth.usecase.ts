@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { CookieOptions, Response } from 'express';
+import { CookieOptions } from 'express';
 import { ConfigService } from '@nestjs/config';
 
 import {
@@ -23,6 +23,14 @@ import {
 import { IRefreshSession } from '../domain/entities/refresh-session.entity';
 import { IClientMetadata } from '@app/decorators';
 import { REFRESH_TOKEN_COOKIE_NAME } from '../infrastructure/guards/refresh.guard';
+import {
+  EMAIL_SCHEDULING_SERVICE_TOKEN,
+  IEmailSchedulingService,
+} from '../../email-scheduling/domain/ports/email-scheduling-service.port';
+import {
+  IReviewService,
+  REVIEW_SERVICE_TOKEN,
+} from '../../review/domain/ports/review-service.port';
 
 @Injectable()
 export class AuthUseCase implements IAuthService {
@@ -32,6 +40,10 @@ export class AuthUseCase implements IAuthService {
     @Inject(USER_SERVICE_TOKEN) private readonly userUseCase: IUserService,
     @Inject(REFRESH_SESSION_REPOSITORY_TOKEN)
     private readonly refreshSessionRepository: IRefreshSessionRepository,
+    @Inject(EMAIL_SCHEDULING_SERVICE_TOKEN)
+    private readonly emailSchedulingService: IEmailSchedulingService,
+    @Inject(REVIEW_SERVICE_TOKEN)
+    private readonly reviewUseCase: IReviewService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {
@@ -44,8 +56,16 @@ export class AuthUseCase implements IAuthService {
     input: IUser,
     clientMeta: IClientMetadata,
     fingerprint: string,
+    isReceiveLetters: boolean,
   ): Promise<ITokens> {
     const user = await this.userUseCase.createUser(input);
+
+    if (isReceiveLetters) {
+      await this.emailSchedulingService.scheduleEmail({
+        recipient: input.email,
+        subject: 'Review App',
+      });
+    }
 
     return await this.issuingTokens(user, clientMeta, fingerprint);
   }

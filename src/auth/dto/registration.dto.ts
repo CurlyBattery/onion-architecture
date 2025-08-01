@@ -1,4 +1,11 @@
-import { IsNotEmpty, IsString, MinLength, Validate } from 'class-validator';
+import {
+  IsBoolean,
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  MinLength,
+  Validate,
+} from 'class-validator';
 import { IsMatchPasswords } from '@app/decorators';
 
 export class RegistrationDto {
@@ -10,6 +17,10 @@ export class RegistrationDto {
   @IsNotEmpty()
   password: string;
 
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+
   @IsString()
   @IsNotEmpty()
   @MinLength(6)
@@ -19,4 +30,8 @@ export class RegistrationDto {
   @IsString()
   @IsNotEmpty()
   fingerprint: string;
+
+  @IsBoolean()
+  @IsNotEmpty()
+  isReceiveLetters: boolean;
 }
